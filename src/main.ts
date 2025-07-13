@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.use('/api/v1', apiRoutes);
+app.use('/', apiRoutes);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('API is running!');
