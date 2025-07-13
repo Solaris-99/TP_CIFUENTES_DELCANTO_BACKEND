@@ -1,21 +1,18 @@
-import express from "express";
-import type { NextFunction, Request, Response } from "express";
-// Se define lo necesario para el servidor
-const app = express();
-const port = 3000;
-// Se define un middleware, para que se puedan manejar peticiones y respuestas en formato json
+import express, { type Application, type Request, type Response } from 'express';
+import 'express-async-errors';
+import apiRoutes from './api/routes.ts';
+
+const app: Application = express();
+const port = process.env.PORT || 3000;
+
 app.use(express.json());
-// Se define el endpoint raiz, para obtener un recurso
-app.get("/", (req: Request, res: Response) => {
-  res.send({ message: "Hello World" });
+
+app.use('/api/v1', apiRoutes);
+
+app.get('/', (req: Request, res: Response) => {
+  res.send('API is running!');
 });
 
-//Manejo de errores
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  res.status(500).send("Algo salió mal");
-}); 
-
-// Se levanta el servidor y escucha en el puerto 3000
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });
