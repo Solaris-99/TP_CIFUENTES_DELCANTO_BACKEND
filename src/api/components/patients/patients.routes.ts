@@ -1,44 +1,36 @@
-/* import { Router } from 'express';
+import { Router } from 'express';
 import * as PatientController from './patients.controller.ts';
-import { checkAuth } from '../../../middleware/auth.middleware.ts';
-import { checkRole } from '../../../middleware/role.middleware.ts';
+import { checkAuth } from '../../../middleware/security.middleware.ts';
+//import { checkRole } from '../../../middleware/role.middleware.ts';
 
 const router = Router();
-
-// Middleware de autenticación para todas las rutas de pacientes
-router.use(checkAuth, checkRole(['admin', 'therapist']));
+router.use(checkAuth);
 
 // --- Rutas de Pacientes ---
-router.get('/', PatientController.getPatients);
+router.get('/', PatientController.getAllPatients);
 router.get('/:patientId', PatientController.getPatientById);
+//router.post('/', PatientController.createPatient);
+//router.delete('/:patientId', PatientController.deletePatient);
 
-// --- Rutas anidadas para el Equipo (Team) ---
-const teamRouter = Router({ mergeParams: true });
-teamRouter.get('/', PatientController.getPatientTeam);
-teamRouter.post('/', checkRole(['admin']), PatientController.addTherapistToTeam); // Solo admin puede agregar
-teamRouter.delete('/:therapistId', checkRole(['admin']), PatientController.removeTherapistFromTeam); // Solo admin puede quitar
-router.use('/:patientId/team', teamRouter);
+// --- Rutas de Equipo ---
+router.get('/:patientId/team', PatientController.getPatientTeam);
+router.post('/:patientId/team', PatientController.addTherapistToTeam); // Solo admin
+router.delete('/:patientId/team/:therapistId', PatientController.removeTherapistFromTeam); // Solo admin
 
-// --- Rutas anidadas para Programas (Programs) ---
-const programRouter = Router({ mergeParams: true });
-programRouter.get('/', PatientController.getPatientPrograms);
-programRouter.post('/', PatientController.addProgramToPatient);
-programRouter.patch('/:programId', PatientController.updateProgram);
-programRouter.put('/:programId/background', PatientController.updateProgramBackground);
-router.use('/:patientId/programs', programRouter);
+// --- Rutas de Programas ---
+router.get('/:patientId/programs', PatientController.getPatientPrograms);
+router.post('/:patientId/programs', PatientController.addProgramToPatient);
+router.patch('/:patientId/programs/:programId', PatientController.updateProgramStatus);
+router.put('/:patientId/programs/:programId/background', PatientController.updateProgramBackground);
 
-// --- Rutas anidadas para Unidades (Units) ---
-const unitRouter = Router({ mergeParams: true });
-unitRouter.get('/', PatientController.getProgramUnits);
-unitRouter.post('/', PatientController.addUnitToProgram);
-unitRouter.patch('/:unitId', PatientController.updateUnit);
-router.use('/:patientId/programs/:programId/units', unitRouter);
+// --- Rutas de Unidades ---
+router.get('/:patientId/programs/:programId/units', PatientController.getProgramUnits);
+router.post('/:patientId/programs/:programId/units', PatientController.addUnitToProgram);
+router.patch('/:patientId/programs/:programId/units/:unitId', PatientController.updateUnitStatus);
 
-// --- Rutas anidadas para Registros (Registry) ---
-const registryRouter = Router({ mergeParams: true });
-registryRouter.get('/', PatientController.getUnitRegistries);
-registryRouter.post('/', PatientController.addRegistryToUnit);
-registryRouter.delete('/:registryId', PatientController.deleteRegistry);
-router.use('/:patientId/programs/:programId/units/:unitId/registry', registryRouter);
+// --- Rutas de Registros ---
+router.get('/:patientId/programs/:programId/units/:unitId/registry', PatientController.getUnitRegistries);
+router.post('/:patientId/programs/:programId/units/:unitId/registry', PatientController.addRegistryToUnit);
+router.delete('/:patientId/programs/:programId/units/:unitId/registry/:registryId', PatientController.deleteRegistry);
 
-export default router; */
+export default router;
