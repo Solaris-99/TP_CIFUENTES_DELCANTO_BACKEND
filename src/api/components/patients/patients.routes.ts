@@ -1,10 +1,8 @@
 import { Router } from 'express';
 import * as PatientController from './patients.controller.ts';
-import { checkAuth } from '../../../middleware/security.middleware.ts';
 import { checkPermission } from '../../../middleware/coordinatorCheck.middleware.ts';
 
 const router = Router();
-router.use(checkAuth);
 
 // --- Rutas de Pacientes ---
 router.get('/', PatientController.getAllPatients);
