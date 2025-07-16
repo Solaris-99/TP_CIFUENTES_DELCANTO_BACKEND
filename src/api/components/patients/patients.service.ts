@@ -1,5 +1,6 @@
 import { ResponseError } from "../../../common/errors/ResponseError";
 import pool from "../../../config/db";
+import type { Patient } from "./patients.entity";
 
 export const getAllPatients = async () => {
   try {
@@ -29,6 +30,28 @@ export const getPatientById = async (patientId: string) => {
   }
 
   return result.rows[0];
+}
+
+export const createPatient = async (patient: Patient) => {
+  const { name, dni, diagnosis, observations, birthdate } = patient;
+  const result = await pool.query(`
+    INSERT INTO patient (name, dni, diagnosis, observations, birthdate, date_creation)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING id
+  `, [name, dni, diagnosis, observations, birthdate, new Date()]);
+
+  return result.rows[0];
+}
+
+export const deletePatient = async (patientId: string) => {
+  const result = await pool.query(`
+    DELETE FROM patient
+    WHERE id = $1
+  `, [patientId]);
+
+  if (result.rowCount === 0) {
+    throw new ResponseError(404, 'Patient not found');
+  }
 }
 
 export const getPatientTeam = async (patientId: string) => {

@@ -1,21 +1,19 @@
 import { Router } from 'express';
 import * as PatientController from './patients.controller.ts';
-import { checkAuth } from '../../../middleware/security.middleware.ts';
-//import { checkRole } from '../../../middleware/role.middleware.ts';
+import { checkPermission } from '../../../middleware/coordinatorCheck.middleware.ts';
 
 const router = Router();
-router.use(checkAuth);
 
 // --- Rutas de Pacientes ---
 router.get('/', PatientController.getAllPatients);
 router.get('/:patientId', PatientController.getPatientById);
-//router.post('/', PatientController.createPatient);
-//router.delete('/:patientId', PatientController.deletePatient);
+router.post('/', PatientController.createPatient);
+router.delete('/:patientId', PatientController.deletePatient);
 
 // --- Rutas de Equipo ---
 router.get('/:patientId/team', PatientController.getPatientTeam);
-router.post('/:patientId/team', PatientController.addTherapistToTeam); // Solo admin
-router.delete('/:patientId/team/:therapistId', PatientController.removeTherapistFromTeam); // Solo admin
+router.post('/:patientId/team', checkPermission, PatientController.addTherapistToTeam);
+router.delete('/:patientId/team/:therapistId', checkPermission, PatientController.removeTherapistFromTeam);
 
 // --- Rutas de Programas ---
 router.get('/:patientId/programs', PatientController.getPatientPrograms);
