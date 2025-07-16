@@ -9,12 +9,18 @@ export const getAllPatients = async (req: Request, res: Response) => {
 };
 
 export const getPatientById = async (req: Request, res: Response) => {
-  try {
-    const patient = await PatientService.getPatientById(req.params.patientId);
-    res.status(200).json(patient);
-  } catch (error) {
-    res.status(error.statusCode).json({ message: error.message });
-  }
+  const patient = await PatientService.getPatientById(req.params.patientId);
+  res.status(200).json(patient);
+};
+
+export const createPatient = async (req: Request, res: Response) => {
+  const newPatient = await PatientService.createPatient(req.body);
+  res.status(201).json(newPatient);
+}
+
+export const deletePatient = async (req: Request, res: Response) => {
+  await PatientService.deletePatient(req.params.patientId);
+  res.status(204).send();
 };
 
 // Team

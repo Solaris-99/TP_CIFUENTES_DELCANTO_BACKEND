@@ -2,9 +2,9 @@ import { type Request, type Response, type NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { ResponseError } from '../common/errors/ResponseError.ts';
 
-interface DecodedToken {
+export interface DecodedToken {
   id: string;
-  role: string;
+  is_coordinator: boolean;
 }
 
 export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
