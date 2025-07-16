@@ -14,6 +14,7 @@ interface Therapist {
 
 export const getTherapists = async () => {
     const res: QueryResult<Therapist> = await pool.query("SELECT * FROM therapist");
+    console.log(`therapists: `, res.rows)
     return res.rows;
 }
 
@@ -31,6 +32,7 @@ export const deleteTherapist = async ( id: number)=>{
     if (res.rowCount === 0){
         throw new ResponseError(404, 'Therapist not found');
     }
+    await pool.query("DELETE FROM credentials WHERE therapist_id = $1", [id])
     return true;
 }
 

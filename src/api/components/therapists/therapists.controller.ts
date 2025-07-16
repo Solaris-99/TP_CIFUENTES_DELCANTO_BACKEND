@@ -14,7 +14,7 @@ export const getTherapist = async (req: Request, res: Response) => {
 
 export const deleteTherapist = async(req: Request, res: Response) => {
     await TherapistService.deleteTherapist(parseInt(req.params.id));
-    res.status(200).send("Therapist deleted")
+    res.status(204);
 }
 
 export const updateTherapist = async(req: Request, res: Response) => {
