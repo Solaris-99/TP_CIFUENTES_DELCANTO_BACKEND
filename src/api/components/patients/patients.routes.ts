@@ -5,7 +5,8 @@ import { checkPermission } from '../../../middleware/coordinatorCheck.middleware
 const router = Router();
 
 // --- Rutas de Pacientes ---
-router.get('/', PatientController.getAllPatients);
+router.get('/', checkPermission, PatientController.getAllPatients);
+router.get('/myPatients', PatientController.getAllPatients);
 router.get('/:patientId', PatientController.getPatientById);
 router.post('/', PatientController.createPatient);
 router.delete('/:patientId', PatientController.deletePatient);
