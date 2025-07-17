@@ -8,6 +8,11 @@ export const getAllPatients = async (req: Request, res: Response) => {
   res.status(200).json(patients);
 };
 
+export const getAllPatientsOfTherapist = async (req: Request, res: Response)=>{
+  const patients = await PatientService.getAllPatientsOfTherapist(req.user.id);
+  res.status(200).json(patients)
+}
+
 export const getPatientById = async (req: Request, res: Response) => {
   const patient = await PatientService.getPatientById(req.params.patientId);
   res.status(200).json(patient);

@@ -18,6 +18,26 @@ export const getAllPatients = async () => {
   }
 }
 
+export const getAllPatientsOfTherapist = async (therapistId: number)=>{
+  try {
+    const result = await pool.query(`
+      SELECT p.id, p.date_creation, p.name, p.dni, p.diagnosis, p.observations, p.birthdate
+      FROM patient p
+      JOIN patient_therapist pt ON p.id = pt.patient_id
+      JOIN therapist t ON t.id = pt.therapist_id
+      WHERE t.id = $1
+      ORDER BY p.date_creation DESC
+    `, [therapistId]);
+
+    return result.rows;
+  }
+  catch (error) {
+    console.error('Error fetching patients:', error);
+    throw new ResponseError(500, 'Error fetching patients');
+  }
+
+}
+
 export const getPatientById = async (patientId: string) => {
   const result = await pool.query(`
       SELECT p.id, p.date_creation, p.name, p.dni, p.diagnosis, p.observations, p.birthdate
@@ -205,7 +225,7 @@ export const updateUnitStatus = async (unitId: string, status: string) => {
 export const getUnitRegistries = async (unitId: string) => {
   try {
     const result = await pool.query(`
-      SELECT r.id, r.date_created, r.value
+      SELECT r.id, r.date_created, r.value, r.therapist_id
       FROM registry r
       WHERE r.unit_id = $1
     `, [unitId]);
