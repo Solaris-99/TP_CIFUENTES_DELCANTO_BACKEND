@@ -18,7 +18,7 @@ export const getAllPatients = async () => {
   }
 }
 
-export const getAllPatientsOfTherapist = async (therapistId: number)=>{
+export const getAllPatientsOfTherapist = async (therapistId: number) => {
   try {
     const result = await pool.query(`
       SELECT p.id, p.date_creation, p.name, p.dni, p.diagnosis, p.observations, p.birthdate
@@ -137,14 +137,78 @@ interface Program {
   last_update: Date;
   name: string;
   antecedent: string;
-  status: string;
+  status: ProgramStatus;
+  unit_count?: number;
+  unit_active_count?: number;
 }
 
-export const addProgramToPatient = async (patientId: string, program: Program) => {
-  return await pool.query(`
-      INSERT INTO program (date_creation, last_updated, name, antecedent, status, patient_id)
-      VALUES ($1, $2, $3, $4, $5, $6)
-    `, [new Date(), new Date(), program.name, program.antecedent, program.status, patientId]);
+export const getPatientProgram = async (programId: string): Promise<Program> => {
+  const result = await pool.query(`
+      SELECT 
+        p.id,
+        p.name,
+        p.antecedent,
+        p.status,
+        count(u.id) AS unit_count,
+        sum(CASE WHEN u.status = 'Activo' THEN 1 ELSE 0 END) AS unit_active_count,
+        sum(CASE WHEN u.status = 'Completado' THEN 1 ELSE 0 END) AS unit_completed_count
+      FROM program p
+      LEFT JOIN unit u ON p.id = u.program_id
+      WHERE p.id = $1
+      GROUP BY p.id
+    `, [programId]);
+
+  if (result.rowCount === 0) {
+    throw new ResponseError(404, 'Program not found');
+  }
+
+  return result.rows[0];
+}
+
+export const getProgramBackground = async (programId: string) => {
+  const result = await pool.query(`
+      SELECT antecedent
+      FROM program
+      WHERE id = $1
+    `, [programId]);
+
+  if (result.rowCount === 0) {
+    throw new ResponseError(404, 'Program not found');
+  }
+
+  return result.rows[0];
+}
+
+
+enum ProgramStatus {
+  ACTIVE = 'Activo',
+  COMPLETED = 'Completado',
+  SUSPENDED = 'Suspendido'
+}
+
+export const addProgramToPatient = async (patientId: string, name: string) => {
+  const result = await pool.query(`
+      INSERT INTO program (date_creation, last_updated, name, status, patient_id)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `, [new Date(), new Date(), name, ProgramStatus.ACTIVE, patientId]);
+
+  return result.rows[0];
+}
+
+export const removeProgramFromPatient = async (programId: string) => {
+  const result = await pool.query(`
+      DELETE FROM program
+      WHERE id = $1
+      RETURNING id
+    `, [programId]);
+
+  console.log('Program removed:', result.rows[0]);
+
+  if (result.rowCount === 0) {
+    throw new ResponseError(404, 'Program not found');
+  }
+  return { message: 'Program removed successfully' };
 }
 
 export const updateProgramStatus = async (programId: string, status: string) => {
@@ -190,17 +254,24 @@ interface Unit {
   name: string;
   date_created?: Date;
   last_update?: Date;
-  status: string;
+  status: UnitStatus;
 }
 
-export const addUnitToProgram = async (programId: string, unit: Unit) => {
+enum UnitStatus {
+  ACTIVE = 'Activo',
+  COMPLETED = 'Completado',
+  SUSPENDED = 'Suspendido'
+}
+
+export const addUnitToProgram = async (programId: string, name: string) => {
   try {
-    await pool.query(`
+    const response = await pool.query(`
       INSERT INTO unit (program_id, status, date_created, last_updated, name)
       VALUES ($1, $2, $3, $4, $5)
-    `, [programId, unit.status, new Date(), new Date(), unit.name]);
+      RETURNING *
+    `, [programId, UnitStatus.ACTIVE, new Date(), new Date(), name]);
 
-    return { message: 'Unit added to program successfully' };
+    return response.rows[0];
   }
   catch (error) {
     console.error('Error adding unit to program:', error);

@@ -18,9 +18,12 @@ router.delete('/:patientId/team/:therapistId', checkPermission, PatientControlle
 
 // --- Rutas de Programas ---
 router.get('/:patientId/programs', PatientController.getPatientPrograms);
+router.get('/:patientId/programs/:programId', PatientController.getPatientProgram);
 router.post('/:patientId/programs', PatientController.addProgramToPatient);
 router.patch('/:patientId/programs/:programId', PatientController.updateProgramStatus);
+router.delete('/:patientId/programs/:programId', PatientController.removeProgramFromPatient);
 router.put('/:patientId/programs/:programId/background', PatientController.updateProgramBackground);
+router.get('/:patientId/programs/:programId/background', PatientController.getProgramBackground);
 
 // --- Rutas de Unidades ---
 router.get('/:patientId/programs/:programId/units', PatientController.getProgramUnits);
