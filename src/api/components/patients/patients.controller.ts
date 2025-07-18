@@ -8,7 +8,7 @@ export const getAllPatients = async (req: Request, res: Response) => {
   res.status(200).json(patients);
 };
 
-export const getAllPatientsOfTherapist = async (req: Request, res: Response)=>{
+export const getAllPatientsOfTherapist = async (req: Request, res: Response) => {
   const patients = await PatientService.getAllPatientsOfTherapist(req.user.id);
   res.status(200).json(patients)
 }
@@ -54,9 +54,20 @@ export const getPatientPrograms = async (req: Request, res: Response) => {
   res.status(200).json(programs);
 }
 
+export const getPatientProgram = async (req: Request, res: Response) => {
+  const program = await PatientService.getPatientProgram(req.params.programId);
+  res.status(200).json(program);
+}
+
 export const addProgramToPatient = async (req: Request, res: Response) => {
-  await PatientService.addProgramToPatient(req.params.patientId, req.body);
-  res.status(201).json({ message: 'Program added to patient' });
+  const program = await PatientService.addProgramToPatient(req.params.patientId, req.body.name);
+  res.status(201).json(program ? program : { message: 'Program added to patient' });
+}
+
+export const removeProgramFromPatient = async (req: Request, res: Response) => {
+  const { programId } = req.params;
+  await PatientService.removeProgramFromPatient(programId);
+  res.status(204).send();
 }
 
 export const updateProgramStatus = async (req: Request, res: Response) => {
@@ -73,6 +84,14 @@ export const updateProgramBackground = async (req: Request, res: Response) => {
   res.status(200).json({ message: 'Program background updated' });
 }
 
+export const getProgramBackground = async (req: Request, res: Response) => {
+  const program  = await PatientService.getProgramBackground(req.params.programId);
+  if (!program) {
+    return res.status(404).json({ message: 'Program not found' });
+  }
+  res.status(200).json(program);
+}
+
 // Units
 
 export const getProgramUnits = async (req: Request, res: Response) => {
@@ -81,9 +100,9 @@ export const getProgramUnits = async (req: Request, res: Response) => {
 }
 
 export const addUnitToProgram = async (req: Request, res: Response) => {
-  const { name, status } = req.body;
-  await PatientService.addUnitToProgram(req.params.programId, { name, status });
-  res.status(201).json({ message: 'Unit added to program' });
+  const { name } = req.body;
+  const response = await PatientService.addUnitToProgram(req.params.programId, name);
+  res.status(201).json(response);
 }
 
 export const updateUnitStatus = async (req: Request, res: Response) => {

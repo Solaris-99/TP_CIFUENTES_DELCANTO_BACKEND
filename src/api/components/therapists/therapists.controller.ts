@@ -1,5 +1,4 @@
 import { type Request, type Response } from 'express';
-import { checkAuth } from '../../../middleware/security.middleware';
 import * as TherapistService from './therapists.service'
 
 export const getTherapists = async (req: Request, res: Response) => {
@@ -14,7 +13,7 @@ export const getTherapist = async (req: Request, res: Response) => {
 
 export const deleteTherapist = async(req: Request, res: Response) => {
     await TherapistService.deleteTherapist(parseInt(req.params.id));
-    res.status(204);
+    res.status(204).send();
 }
 
 export const updateTherapist = async(req: Request, res: Response) => {
