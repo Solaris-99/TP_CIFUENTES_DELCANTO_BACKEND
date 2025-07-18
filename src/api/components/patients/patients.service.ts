@@ -52,12 +52,12 @@ export const getPatientById = async (patientId: string) => {
   return result.rows[0];
 }
 
-export const createPatient = async (patient: Patient) => {
+export const createPatient = async (patient: Patient) : Promise<Patient> => {
   const { name, dni, diagnosis, observations, birthdate } = patient;
   const result = await pool.query(`
     INSERT INTO patient (name, dni, diagnosis, observations, birthdate, date_creation)
     VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING id
+    RETURNING *
   `, [name, dni, diagnosis, observations, birthdate, new Date()]);
 
   return result.rows[0];
