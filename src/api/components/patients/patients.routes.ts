@@ -6,7 +6,7 @@ const router = Router();
 
 // --- Rutas de Pacientes ---
 router.get('/', checkPermission, PatientController.getAllPatients);
-router.get('/myPatients', PatientController.getAllPatients);
+router.get('/myPatients', PatientController.getAllPatientsOfTherapist);
 router.get('/:patientId', PatientController.getPatientById);
 router.post('/', PatientController.createPatient);
 router.delete('/:patientId', PatientController.deletePatient);

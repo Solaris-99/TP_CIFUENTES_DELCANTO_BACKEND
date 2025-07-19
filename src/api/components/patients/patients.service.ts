@@ -25,7 +25,7 @@ export const getAllPatientsOfTherapist = async (therapistId: number) => {
       FROM patient p
       JOIN patient_therapist pt ON p.id = pt.patient_id
       JOIN therapist t ON t.id = pt.therapist_id
-      WHERE t.id = $1
+      WHERE pt.therapist_id = $1
       ORDER BY p.date_creation DESC
     `, [therapistId]);
 

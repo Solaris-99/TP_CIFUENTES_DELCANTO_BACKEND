@@ -9,7 +9,8 @@ export const getAllPatients = async (req: Request, res: Response) => {
 };
 
 export const getAllPatientsOfTherapist = async (req: Request, res: Response) => {
-  const patients = await PatientService.getAllPatientsOfTherapist(req.user.id);
+  const { id } = req.user;
+  const patients = await PatientService.getAllPatientsOfTherapist(id);
   res.status(200).json(patients)
 }
 
