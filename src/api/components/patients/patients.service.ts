@@ -120,7 +120,7 @@ export const removeTherapistFromTeam = async (patientId: string, therapistId: st
 export const getPatientPrograms = async (patientId: string) => {
   try {
     const result = await pool.query(`
-      SELECT p.id, p.name, p.antecedent, p.status
+      SELECT p.id, p.name, p.antecedent, p.status, p.date_creation, p.last_updated
       FROM program p
       WHERE p.patient_id = $1
     `, [patientId]);
@@ -238,7 +238,7 @@ export const updateProgramBackground = async (programId: string, background: str
 export const getProgramUnits = async (programId: string) => {
   try {
     const result = await pool.query(`
-      SELECT u.id, u.name, u.status
+      SELECT u.id, u.name, u.status, u.date_created, u.last_updated
       FROM unit u
       WHERE u.program_id = $1
     `, [programId]);
@@ -253,7 +253,7 @@ interface Unit {
   id?: number;
   name: string;
   date_created?: Date;
-  last_update?: Date;
+  last_updated?: Date;
   status: UnitStatus;
 }
 
